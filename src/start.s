@@ -2,14 +2,6 @@
 .text
 .code 32
 .global reset_handler, vectors_start, vectors_end
-reset_handler:
-    LDR sp, =svc_stack_top // set SVC mode stack
-    BL copy_vectors // copy vector table to address 0
-    MSR cpsr, #0x92 // to IRQ mode
-    LDR sp, =irq_stack_top // set IRQ mode stack
-    MSR cpsr, #0x13 // go back to SVC mode with IRQ on
-    BL main // call main() in C
-    B . // loop if main ever return
 
 irq_handler:
     sub lr, lr, #4
@@ -34,3 +26,12 @@ vectors_start:
     irq_handler_addr: .word irq_handler
     fiq_handler_addr: .word fiq_handler
 vectors_end:
+
+reset_handler:
+    LDR sp, =svc_stack_top // set SVC mode stack
+    // BL copy_vectors copy vector table to address 0
+    MSR cpsr, #0x92 // to IRQ mode
+    LDR sp, =irq_stack_top // set IRQ mode stack
+    MSR cpsr, #0x13 // go back to SVC mode with IRQ on
+    BL main // call main() in C
+    B . // loop if main ever return
